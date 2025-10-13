@@ -88,13 +88,14 @@ export default {
         // Hide the Sampler channel if we're a mini with Mix2..
         return false;
       }
+
+      if (!isDeviceMini() && firmwareSupportsMix2() && isStreamNoMusic() && name == "StreamMix2") {
+        // Full Sized Mix2 Firmware with isStreamNoMusic
+        return false;
+      }
       
       // The Mix A / B assignment is potentially defined by the regular StreamMix
-      if (isDeviceMini() && isStreamNoMusic()) {
-        return false
-      }
-
-      return true;
+      return !(isDeviceMini() && isStreamNoMusic());
     }
   },
   computed: {

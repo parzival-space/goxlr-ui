@@ -18,6 +18,10 @@
       <template v-slot:title>{{ $t('message.system.deviceButton') }}</template>
 
       <div class="settingList" role="region" :aria-label="$t('message.system.deviceButton')">
+        <ListSetting v-if="isDeviceMini() || (!isDeviceMini() && firmwareSupportsMix2())" :value="getVodMode()" :options="getVodModeKeys()"
+                     :description="`Sets ${getKeyForMix2()} behaviour`"
+                     :label="`${getKeyForMix2()} Behaviour`" @change="setVodMode"/>
+
         <NumberSetting :value="getHold()" :min="0" :max="5000" suffix="ms" @change="updateHold"
                        :label="$t('message.system.device.holdDuration')"
                        :description="$t('message.system.device.holdDurationAccessibility')"/>
@@ -43,11 +47,6 @@
                         :enabled="get_locked_faders()" @change="set_locked_faders"
                         :description="$t('message.system.device.lockFadersAccessibility')"/>
 
-        <ListSetting v-if="isDeviceMini()" :value="getVodMode()" :options="getVodModeKeys()"
-                     :description="`Sets ${getKeyForSampler()} behaviour`"
-                     :label="`${getKeyForSampler()} Behaviour`" @change="setVodMode"/>
-
-
       </div>
 
     </AccessibleModal>
@@ -61,7 +60,16 @@ import SimpleNumberInput from "@/components/design/SimpleNumberInput.vue";
 import {store} from "@/store";
 import {websocket} from "@/util/sockets";
 import BigButton from "@/components/buttons/BigButton.vue";
-import {driverVOD, isDeviceMini, isStreamNoMusic, isWindowsDriver, versionNewerOrEqualTo} from "@/util/util";
+import {
+  driverMix2,
+  driverPreVOD,
+  driverVOD,
+  firmwareSupportsMix2,
+  isDeviceMini,
+  isStreamNoMusic,
+  isWindowsDriver,
+  versionNewerOrEqualTo
+} from "@/util/util";
 import SettingsButton from "@/components/sections/system/modals/SettingsButton.vue";
 import BooleanSetting from "@/components/sections/system/modals/settings/BooleanSetting.vue";
 import NumberSetting from "@/components/sections/system/modals/settings/NumberSetting.vue";
@@ -80,6 +88,7 @@ export default {
   },
 
   methods: {
+    firmwareSupportsMix2,
     isDeviceMini,
     getHold() {
       return store.getActiveDevice().settings.mute_hold_duration;
@@ -174,13 +183,28 @@ export default {
       websocket.send_command(store.getActiveSerial(),{"SetVodMode": value});
     },
 
-    getKeyForSampler() {
+    getKeyForMix2() {
       let sample = "Sampler";
       let vod = "VOD";
+      let mix2 = "Stream Mix 2";
 
       if (store.hasActiveDevice()) {
-        if (isDeviceMini() && isWindowsDriver() && driverVOD()) {
-          return vod;
+        if (isWindowsDriver()) {
+          if (driverPreVOD()) {
+            return sample
+          } else if (driverVOD()) {
+            return vod
+          } else if (driverMix2()) {
+            return mix2
+          }
+        } else {
+          // We're on Linux, so there's no reliable way to check the alsa-ucm-conf package, if they
+          // have the Mix2 firmware installed, we'll use the Mix2 label, otherwise assume Sample
+          if (!firmwareSupportsMix2()) {
+            return sample
+          } else {
+            return mix2
+          }
         }
       }
       return sample;

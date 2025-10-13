@@ -51,10 +51,6 @@ export function driverMix2() {
 }
 
 export function isStreamNoMusic() {
-    if (!isDeviceMini()) {
-        return false;
-    }
-
     return store.getActiveDevice().settings.vod_mode === "StreamNoMusic";
 }
 
