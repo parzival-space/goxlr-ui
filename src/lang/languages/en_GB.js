@@ -791,6 +791,8 @@ export default {
                 warning: "You are about to flash a new firmware version to your device.\nThe developers of the GoXLR Utility are not responsible for any damage that can be caused by this process. ",
                 warningInfo: "More Info",
 
+                betaWarning: "You are about to install a beta firmware version.\nThis version will not receive any official support and may contain bugs or issues that we cannot fix.",
+
                 updatePaused: "You are about to install firmware version {version}. Are you sure you want to continue?",
                 updateInProgress: "Firmware Update in Progress. Please wait and do not disconnect your device!",
                 completed: "The firmware update has completed successfully.",

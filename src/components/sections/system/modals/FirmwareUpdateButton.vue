@@ -17,6 +17,10 @@
         >{{ $t('message.system.firmwareUpdate.warningInfo') }}</a>
       </p>
 
+      <p class="firmwareBetaWarning" v-if="!customFirmware && isBetaUpdateSite()">
+        {{ $t('message.system.firmwareUpdate.betaWarning') }}
+      </p>
+
       <p v-if="customFirmware">
         {{ $t('message.system.firmwareUpdate.customFirmware') }}
       </p>
@@ -98,6 +102,10 @@ export default {
       };
 
       this.updateButtonTitle = this.getNewUpdateButtonTitle();
+    },
+
+    isBetaUpdateSite() {
+        return store.getConfig() === undefined || store.getConfig().firmware_source === "Beta";
     },
 
     getNewUpdateButtonTitle() {
@@ -271,6 +279,12 @@ export default {
       color: #59b1b6;
     }
   }
+}
+
+.firmwareBetaWarning {
+  padding: 10px;
+  border-left: 5px solid rgba(204, 156, 0, 0.5);
+  background: rgba(204, 177, 0, 0.1);
 }
 
 .changelog {
