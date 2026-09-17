@@ -67,7 +67,7 @@ export default {
 
     profileChanged() {
       // Only send an update to the Daemon if the Load Colours checkbox is actually checked.
-      if (!this.$refs.loadFullProfile.checked) {
+      if (!this.$refs.loadProfile.checked) {
         return;
       }
       this.generateActions();
